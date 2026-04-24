@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 export default defineConfig({
+  base: './', // 确保静态资源路径使用相对路径
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

@@ -13,7 +13,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 function App() {
   return (
     <TooltipProvider delayDuration={200}>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
