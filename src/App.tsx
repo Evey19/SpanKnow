@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { HomePage } from "./pages/HomePage";
 import { LibraryPage } from "./pages/LibraryPage";
 import { AddPage } from "./pages/AddPage";
@@ -13,7 +13,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 function App() {
   return (
     <TooltipProvider delayDuration={200}>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
@@ -25,7 +25,7 @@ function App() {
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
         <Toaster />
-      </BrowserRouter>
+      </HashRouter>
     </TooltipProvider>
   );
 }
