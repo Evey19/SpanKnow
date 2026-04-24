@@ -16,7 +16,9 @@ export interface AiChatResponse {
   sources: AiChatSource[];
 }
 
-const AI_CHAT_URL = "http://localhost:3000/api/ai/chat/stream";
+const AI_CHAT_URL = import.meta.env.VITE_API_BASE_URL 
+  ? `${import.meta.env.VITE_API_BASE_URL}/ai/chat/stream`
+  : "/api/ai/chat/stream";
 
 export async function chatWithAi(
   payload: AiChatRequest,

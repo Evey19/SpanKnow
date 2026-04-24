@@ -76,7 +76,7 @@ export function AIChatDrawer({ isOpen, onClose }: AIChatDrawerProps) {
               id: (Date.now() + 1).toString(),
               role: "assistant",
               content:
-                "请求失败，请检查本地服务 http://localhost:3000 是否已启动。",
+                "请求失败，请检查网络连接或服务是否正常运行。",
             },
           ]);
         },

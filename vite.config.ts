@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'https://snapknow-api-250345-7-1332603592.sh.run.tcloudbase.com',
         changeOrigin: true,
       },
     },

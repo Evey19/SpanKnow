@@ -1,4 +1,5 @@
-const API_BASE_URL = "/api";
+// 根据环境变量决定 API 基础路径
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export class ApiError extends Error {
   status: number;
@@ -16,7 +17,11 @@ interface RequestConfig extends RequestInit {
 
 function buildUrl(endpoint: string, query?: RequestConfig["query"]) {
   const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const url = new URL(`${API_BASE_URL}${normalizedEndpoint}`, window.location.origin);
+  // 如果 API_BASE_URL 是绝对路径（如 http 开头），则直接使用
+  // 否则（如 /api）拼接当前域名
+  const url = API_BASE_URL.startsWith("http") 
+    ? new URL(`${API_BASE_URL}${normalizedEndpoint}`)
+    : new URL(`${API_BASE_URL}${normalizedEndpoint}`, window.location.origin);
 
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
@@ -26,7 +31,9 @@ function buildUrl(endpoint: string, query?: RequestConfig["query"]) {
     });
   }
 
-  return `${url.pathname}${url.search}`;
+  return API_BASE_URL.startsWith("http")
+    ? url.toString()
+    : `${url.pathname}${url.search}`;
 }
 
 export async function fetchApi<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
