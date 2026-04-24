@@ -1,0 +1,44 @@
+name: Deploy to Tencent CloudBase
+
+on:
+  push:
+    branches:
+      - main # 触发部署的主分支
+  workflow_dispatch: # 允许在 GitHub Actions 面板手动触发
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8 # 指定你的 pnpm 版本
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: pnpm run build
+
+      - name: Deploy to Tencent CloudBase
+        env:
+          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+          ENV_ID: ${{ secrets.TENCENT_ENV_ID }}
+        run: |
+          npm install -g @cloudbase/cli
+          # 登录腾讯云
+          tcb login --apiKeyId $SECRET_ID --apiKey $SECRET_KEY
+          # 部署 dist 目录到静态网站托管的根目录
+          tcb hosting deploy dist / -e $ENV_ID

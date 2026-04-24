@@ -1,0 +1,231 @@
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
+import { FONTS } from "../lib/fonts";
+import { useCurrentUserQuery, useUpdatePreferencesMutation } from "../features/auth/usePreferencesQueries";
+
+interface PreferencesContextType {
+  font: string;
+  setFont: (fontId: string) => void;
+  fontSize: string;
+  setFontSize: (size: string) => void;
+  darkMode: boolean;
+  setDarkMode: (isDark: boolean) => void;
+  notifications: boolean;
+  setNotifications: (enabled: boolean) => void;
+}
+
+const PreferencesContext = createContext<PreferencesContextType | undefined>(
+  undefined
+);
+
+export function PreferencesProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // --- 本地状态初始化 ---
+  const [font, setFont] = useState(() => {
+    return localStorage.getItem("snapknow-font") || localStorage.getItem("snapknow-ui-font") || "system";
+  });
+
+  const [fontSize, setFontSize] = useState(() => {
+    return localStorage.getItem("snapknow-font-size") || "medium";
+  });
+
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("snapknow-dark-mode") === "true";
+  });
+
+  const [notifications, setNotifications] = useState(() => {
+    return localStorage.getItem("snapknow-notifications") !== "false";
+  });
+
+  // 记录是否是初始加载或从远程拉取的同步，防止循环调用 PATCH 接口
+  const isInitialSyncRef = useRef(true);
+
+  // --- 获取后端远程数据 ---
+  const { data: user, isSuccess: isUserSuccess } = useCurrentUserQuery();
+  const updatePreferencesMutation = useUpdatePreferencesMutation();
+
+  // 当从后端成功获取到用户偏好设置时，同步到本地状态
+  useEffect(() => {
+    if (isUserSuccess && user?.preferences) {
+      const remoteFont = user.preferences.font_family;
+      const remoteSize = user.preferences.font_size;
+      const remoteDarkMode = user.preferences.dark_mode;
+      const remoteReminders = user.preferences.review_reminders;
+      let stateChanged = false;
+
+      if (remoteFont && remoteFont !== font) {
+        setFont(remoteFont);
+        stateChanged = true;
+      }
+      if (remoteSize && remoteSize !== fontSize) {
+        setFontSize(remoteSize);
+        stateChanged = true;
+      }
+      if (remoteDarkMode !== undefined && remoteDarkMode !== darkMode) {
+        setDarkMode(remoteDarkMode);
+        stateChanged = true;
+      }
+      if (remoteReminders !== undefined && remoteReminders !== notifications) {
+        setNotifications(remoteReminders);
+        stateChanged = true;
+      }
+
+      // 如果有变更，标记为远端同步带来的变更，稍后不在 useEffect 中触发 PATCH
+      if (stateChanged) {
+        isInitialSyncRef.current = true;
+      }
+    }
+  }, [user, isUserSuccess]); // 仅依赖于获取结果，避免无限循环
+
+  // --- 处理深色模式切换 ---
+  useEffect(() => {
+    const root = document.documentElement;
+    if (darkMode) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    localStorage.setItem("snapknow-dark-mode", String(darkMode));
+
+    // 同步到远端
+    const token = localStorage.getItem("access_token");
+    if (token && !isInitialSyncRef.current) {
+      updatePreferencesMutation.mutate({ dark_mode: darkMode });
+    }
+  }, [darkMode]);
+
+  // --- 处理通知设置持久化与权限请求 ---
+  useEffect(() => {
+    localStorage.setItem("snapknow-notifications", String(notifications));
+
+    // 同步到远端
+    const token = localStorage.getItem("access_token");
+    if (token && !isInitialSyncRef.current) {
+      updatePreferencesMutation.mutate({ review_reminders: notifications });
+    }
+
+    // 处理浏览器推送通知权限
+    if (notifications && "Notification" in window) {
+      if (Notification.permission === "default") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            // TODO: 后续这里可以调用订阅 Service Worker Push Manager 的逻辑
+            console.log("Push notification permission granted.");
+          } else {
+            // 用户拒绝了通知权限，可以考虑自动将开关关闭或给予提示
+            console.log("Push notification permission denied.");
+            setNotifications(false);
+          }
+        });
+      } else if (Notification.permission === "denied") {
+        // 如果之前已经被拒绝，可能需要提示用户去浏览器设置里手动开启
+        console.log("Push notification is denied in browser settings.");
+        // 在这里我们可以选择把开关关掉，以保持 UI 和实际状态一致
+        // setNotifications(false); 
+      }
+    }
+  }, [notifications]);
+
+  // --- 处理字体大小变化及远程同步 ---
+  useEffect(() => {
+    const root = document.documentElement;
+    let sizeValue = "16px"; // medium 默认
+    
+    switch (fontSize) {
+      case "small":
+        sizeValue = "14px";
+        break;
+      case "medium":
+        sizeValue = "16px";
+        break;
+      case "large":
+        sizeValue = "18px";
+        break;
+      case "xlarge":
+        sizeValue = "20px";
+        break;
+    }
+    
+    root.style.fontSize = sizeValue;
+    localStorage.setItem("snapknow-font-size", fontSize);
+
+    // 如果用户已登录，且不是初次/远程同步带来的变更，则向后端发送 PATCH
+    const token = localStorage.getItem("access_token");
+    if (token && !isInitialSyncRef.current) {
+      updatePreferencesMutation.mutate({ font_size: fontSize });
+    }
+  }, [fontSize]);
+
+  // --- 处理字体变化及远程同步 ---
+  useEffect(() => {
+    const root = document.documentElement;
+    const selectedFont = FONTS.find((f) => f.id === font) || FONTS[0]; // fallback to system
+
+    // 设置 CSS 变量，确保使用 Tailwind 的地方生效
+    root.style.setProperty("--font-sans", selectedFont.family);
+    // 强制覆盖 document.body 和 html 的字体
+    document.body.style.fontFamily = selectedFont.family;
+    root.style.fontFamily = selectedFont.family;
+
+    // 存储到 localStorage
+    localStorage.setItem("snapknow-font", selectedFont.id);
+
+    // 动态加载外部字体 (Google Fonts)
+    const loadGoogleFont = (urlParam?: string) => {
+      if (!urlParam) return;
+      const linkId = `google-font-${urlParam.split(':')[0]}`;
+      if (document.getElementById(linkId)) return;
+
+      const link = document.createElement("link");
+      link.id = linkId;
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?family=${urlParam}&display=swap`;
+      document.head.appendChild(link);
+    };
+
+    loadGoogleFont(selectedFont.url);
+
+    // 如果用户已登录，且不是初次/远程同步带来的变更，则向后端发送 PATCH
+    const token = localStorage.getItem("access_token");
+    if (token && !isInitialSyncRef.current) {
+      updatePreferencesMutation.mutate({ font_family: selectedFont.id });
+    }
+
+    // 处理完当前 useEffect 的逻辑后，如果这是初始同步触发的，则重置标志位
+    // 下一次用户手动切换 state 时，isInitialSyncRef.current 将为 false，从而触发后端同步
+    const timer = setTimeout(() => {
+      if (isInitialSyncRef.current) {
+        isInitialSyncRef.current = false;
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [font]);
+
+  return (
+    <PreferencesContext.Provider
+      value={{
+        font,
+        setFont,
+        fontSize,
+        setFontSize,
+        darkMode,
+        setDarkMode,
+        notifications,
+        setNotifications,
+      }}
+    >
+      {children}
+    </PreferencesContext.Provider>
+  );
+}
+
+export function usePreferences() {
+  const context = useContext(PreferencesContext);
+  if (context === undefined) {
+    throw new Error("usePreferences must be used within a PreferencesProvider");
+  }
+  return context;
+}
