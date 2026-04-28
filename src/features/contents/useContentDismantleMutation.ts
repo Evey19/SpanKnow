@@ -9,6 +9,7 @@ export interface KnowledgeCard {
   summary: string;
   analogy: string;
   mnemonic: string;
+  is_in_user_cards?: boolean;
 }
 
 export interface ConfusableGroup {
@@ -31,18 +32,14 @@ export interface ParseResponse {
 
 export function useContentDismantleMutation() {
   return useMutation({
-    mutationFn: async (payload: { text: string }) => {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("请先登录");
-      }
-
+    mutationFn: async (payload: { contentId: string; text: string; force_refresh?: boolean }) => {
       return fetchApi<ParseResponse>(`v1/dismantle/parse`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          text: payload.text,
+          content_id: payload.contentId,
+          force_refresh: payload.force_refresh,
+        }),
       });
     },
   });

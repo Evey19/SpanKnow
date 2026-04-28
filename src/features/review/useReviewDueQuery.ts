@@ -18,33 +18,20 @@ export interface ReviewCard {
   state: number;
   created_at: string;
   updated_at: string;
+  content: any | null;
 }
 
 export interface ReviewDueResponse {
   message: string;
-  data: {
-    total_due: number;
-    new: number;
-    learning: number;
-    review: number;
-    cards: ReviewCard[];
-  };
+  data: ReviewCard[];
 }
 
 export function useReviewDueQuery() {
   return useQuery({
     queryKey: ["review", "due"],
     queryFn: async () => {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("请先登录");
-      }
-
       const response = await fetchApi<ReviewDueResponse>("v1/review/due", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       return response.data;
     },

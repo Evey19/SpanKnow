@@ -38,10 +38,21 @@ function buildUrl(endpoint: string, query?: RequestConfig["query"]) {
 
 export async function fetchApi<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
   const { query, headers, ...restConfig } = config;
+  
+  // 自动附加 token
+  const token = localStorage.getItem("access_token");
+  const defaultHeaders: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  
+  if (token) {
+    defaultHeaders["Authorization"] = `Bearer ${token}`;
+  }
+
   const response = await fetch(buildUrl(endpoint, query), {
     ...restConfig,
     headers: {
-      "Content-Type": "application/json",
+      ...defaultHeaders,
       ...headers,
     },
   });
@@ -54,6 +65,18 @@ export async function fetchApi<T>(endpoint: string, config: RequestConfig = {}):
         message = payload.message;
       }
     } catch {}
+    
+    // 全局处理 401
+    if (response.status === 401) {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user");
+      
+      // 使用 import.meta.env.BASE_URL 和 browser 路由
+      const baseUrl = import.meta.env.BASE_URL || "/";
+      window.location.href = baseUrl.replace(/\/$/, '') + '/auth';
+    }
+    
     throw new ApiError(message, response.status);
   }
 

@@ -14,6 +14,11 @@ export interface UserResponse {
   data: {
     id?: string;
     phone?: string;
+    username?: string;
+    avatar_url?: string;
+    bio?: string;
+    level?: number;
+    experience_points?: number;
     preferences?: UserPreferences;
   };
 }
@@ -50,12 +55,13 @@ export function useUpdatePreferencesMutation() {
       if (!token) {
         throw new Error("No token found");
       }
+      // Note: Backend requires a PUT request with nested "preferences" object
       const response = await fetchApi<any>("v1/auth/preferences", {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(preferences),
+        body: JSON.stringify({ preferences }),
       });
       return response.data;
     },
