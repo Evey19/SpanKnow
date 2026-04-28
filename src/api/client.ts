@@ -72,9 +72,9 @@ export async function fetchApi<T>(endpoint: string, config: RequestConfig = {}):
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
       
-      // 使用 import.meta.env.BASE_URL 和 browser 路由
       const baseUrl = import.meta.env.BASE_URL || "/";
-      window.location.href = baseUrl.replace(/\/$/, '') + '/auth';
+      const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+      window.location.href = `${base}#/auth`;
     }
     
     throw new ApiError(message, response.status);

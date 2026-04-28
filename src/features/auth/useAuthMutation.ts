@@ -120,7 +120,8 @@ export function useLogoutMutation() {
       toast.success("已退出登录");
       
       const baseUrl = import.meta.env.BASE_URL || "/";
-      window.location.href = baseUrl.replace(/\/$/, "") + "/auth";
+      const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+      window.location.href = `${base}#/auth`;
     },
     onError: () => {
       // 即使请求失败，也清空本地数据并跳转
@@ -129,7 +130,8 @@ export function useLogoutMutation() {
       localStorage.removeItem("user");
       
       const baseUrl = import.meta.env.BASE_URL || "/";
-      window.location.href = baseUrl.replace(/\/$/, "") + "/auth";
+      const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+      window.location.href = `${base}#/auth`;
     },
   });
 }
