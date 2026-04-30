@@ -2,14 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Clock,
-  Tag,
   FileText,
   Grid,
   List,
 } from "lucide-react";
 import { Layout } from "../components/Layout";
 import { useContentsQuery } from "@/features/contents/useContentsQuery";
-import { useContentTagsQuery } from "@/features/contents/useContentTagsQuery";
 import { toast } from "sonner";
 
 function formatDate(date: Date): string {
@@ -33,25 +31,14 @@ function getStatusBadge(status: string) {
 
 export function LibraryPage() {
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [keyword, setKeyword] = useState("");
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
 
   const { data, isLoading, error } = useContentsQuery({
     page,
     page_size: 20,
     keyword: keyword.trim() ? keyword.trim() : undefined,
-    tag: selectedTags.length === 1 ? selectedTags[0] : undefined,
-    tags: selectedTags.length > 1 ? selectedTags : undefined,
   });
-
-  const { data: tagsData, error: tagsError } = useContentTagsQuery();
 
   useEffect(() => {
     if (!error) return;
@@ -60,18 +47,10 @@ export function LibraryPage() {
     }
   }, [error]);
 
-  useEffect(() => {
-    if (!tagsError) return;
-    if (tagsError instanceof Error) {
-      toast.error(tagsError.message);
-    }
-  }, [tagsError]);
-
   const items = useMemo(() => data?.data ?? [], [data?.data]);
   const total = data?.total ?? 0;
   const pageSize = data?.page_size ?? 20;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const availableTags = useMemo(() => tagsData?.data ?? [], [tagsData?.data]);
 
   return (
     <Layout>
@@ -119,27 +98,6 @@ export function LibraryPage() {
               搜索
             </button>
           </div>
-
-          {availableTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => {
-                    setPage(1);
-                    toggleTag(tag);
-                  }}
-                  className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
-                    selectedTags.includes(tag)
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-muted-foreground border border-border hover:border-ring/50"
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {isLoading ? (
@@ -147,7 +105,7 @@ export function LibraryPage() {
         ) : error instanceof Error && error.message === "请先登录" ? (
           <div className="text-center py-16">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-              <Tag className="text-muted-foreground" size={40} />
+              <FileText className="text-muted-foreground" size={40} />
             </div>
             <p className="text-muted-foreground text-lg">请先登录后查看内容</p>
             <Link
@@ -160,7 +118,7 @@ export function LibraryPage() {
         ) : items.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-              <Tag className="text-muted-foreground" size={40} />
+              <FileText className="text-muted-foreground" size={40} />
             </div>
             <p className="text-muted-foreground text-lg">暂无知识条目</p>
             <Link
@@ -190,16 +148,7 @@ export function LibraryPage() {
                       {getStatusBadge(item.status)}
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className="flex gap-2 flex-wrap">
-                        {item.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2.5 py-1 text-xs bg-muted text-muted-foreground rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
+                      <div />
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock size={12} />
                         {formatDate(new Date(item.created_at))}
@@ -230,16 +179,7 @@ export function LibraryPage() {
                 <h3 className="font-medium text-foreground text-sm line-clamp-2 mb-3">
                   {item.title}
                 </h3>
-                <div className="flex flex-wrap gap-1">
-                  {item.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <div />
               </Link>
             ))}
           </div>

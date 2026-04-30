@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import {
   ArrowLeft,
   Bell,
@@ -15,7 +15,6 @@ import {
 import { Layout } from "../components/Layout";
 import { usePreferences } from "../contexts/PreferencesContext";
 import { useAvatarMutation, useUpdateProfileMutation, useLogoutMutation } from "@/features/auth/useAuthMutation";
-import { useCurrentUserQuery } from "@/features/auth/usePreferencesQueries";
 import { FONTS } from "../lib/fonts";
 
 export function SettingsPage() {
@@ -36,10 +35,6 @@ export function SettingsPage() {
   const { mutate: updateProfile, isPending: isUpdatingProfile } = useUpdateProfileMutation();
   const { mutate: logout, isPending: isLoggingOut } = useLogoutMutation();
 
-  const { data: remoteUser } = useCurrentUserQuery();
-  const serverProfile = remoteUser;
-
-  // We still fallback to local storage if remote data is missing or loading
   const userStr = localStorage.getItem("user");
   type LocalUser = { avatar?: string | null; avatar_url?: string | null; username?: string | null; phone?: string | null };
   let localUser: LocalUser | null = null;
@@ -50,22 +45,13 @@ export function SettingsPage() {
       localUser = null;
     }
   }
+
+  const user = localUser;
   
-  const user = serverProfile || localUser;
-
   const [localAvatar, setLocalAvatar] = useState<string | null>(
-    localUser?.avatar || localUser?.avatar_url || serverProfile?.avatar_url || null,
+    localUser?.avatar || localUser?.avatar_url || null,
   );
-  const [username, setUsername] = useState<string>(user?.username || "");
-
-  useEffect(() => {
-    if (serverProfile) {
-      setUsername(serverProfile.username || "");
-      if (serverProfile.avatar_url) {
-        setLocalAvatar(serverProfile.avatar_url);
-      }
-    }
-  }, [serverProfile]);
+  const [username, setUsername] = useState<string>(localUser?.username || "");
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

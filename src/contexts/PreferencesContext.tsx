@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { FONTS } from "../lib/fonts";
-import { useCurrentUserQuery, useUpdatePreferencesMutation } from "../features/auth/usePreferencesQueries";
+import { useUpdatePreferencesMutation } from "../features/auth/usePreferencesQueries";
 
 interface PreferencesContextType {
   font: string;
@@ -42,45 +42,7 @@ export function PreferencesProvider({
   // 记录是否是初始加载或从远程拉取的同步，防止循环调用 PATCH 接口
   const isInitialSyncRef = useRef(true);
 
-  // --- 获取后端远程数据 ---
-  const { data: user, isSuccess: isUserSuccess } = useCurrentUserQuery();
   const updatePreferencesMutation = useUpdatePreferencesMutation();
-
-  // 当从后端成功获取到用户偏好设置时，同步到本地状态
-  useEffect(() => {
-    if (isUserSuccess && user?.preferences) {
-      const remoteFont = user.preferences.font_family;
-      const remoteSize = user.preferences.font_size;
-      const remoteDarkMode = user.preferences.dark_mode;
-      const remoteReminders = user.preferences.review_reminders;
-      let stateChanged = false;
-
-      if (remoteFont && remoteFont !== font) {
-        setFont(remoteFont);
-        stateChanged = true;
-      }
-      if (remoteSize && remoteSize !== fontSize) {
-        setFontSize(remoteSize);
-        stateChanged = true;
-      }
-      if (remoteDarkMode !== undefined) {
-        const remoteTheme = remoteDarkMode ? "aurora" : "paper";
-        if (remoteTheme !== uiTheme) {
-          setUiTheme(remoteTheme);
-          stateChanged = true;
-        }
-      }
-      if (remoteReminders !== undefined && remoteReminders !== notifications) {
-        setNotifications(remoteReminders);
-        stateChanged = true;
-      }
-
-      // 如果有变更，标记为远端同步带来的变更，稍后不在 useEffect 中触发 PATCH
-      if (stateChanged) {
-        isInitialSyncRef.current = true;
-      }
-    }
-  }, [user, isUserSuccess]); // 仅依赖于获取结果，避免无限循环
 
   useEffect(() => {
     const root = document.documentElement;
@@ -198,17 +160,11 @@ export function PreferencesProvider({
     if (token && !isInitialSyncRef.current) {
       updatePreferencesMutation.mutate({ font_family: selectedFont.id });
     }
-
-    // 处理完当前 useEffect 的逻辑后，如果这是初始同步触发的，则重置标志位
-    // 下一次用户手动切换 state 时，isInitialSyncRef.current 将为 false，从而触发后端同步
-    const timer = setTimeout(() => {
-      if (isInitialSyncRef.current) {
-        isInitialSyncRef.current = false;
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
   }, [font]);
+
+  useEffect(() => {
+    isInitialSyncRef.current = false;
+  }, []);
 
   return (
     <PreferencesContext.Provider
