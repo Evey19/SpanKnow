@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Moon, Sun, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuthMutation } from "@/features/auth/useAuthMutation";
@@ -21,27 +20,9 @@ export function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [theme, setTheme] = useState<"light" | "dark">("light");
   const navigate = useNavigate();
   
   const { mutateAsync: authenticate, isPending: isLoading } = useAuthMutation();
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    const prefersDark =
-      window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? false;
-    const next =
-      stored === "dark" || stored === "light"
-        ? (stored as "light" | "dark")
-        : prefersDark
-          ? "dark"
-          : "light";
-    setTheme(next);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   const title = useMemo(() => {
     return isLogin ? "登录" : "注册";
@@ -63,23 +44,13 @@ export function AuthPage() {
     try {
       await authenticate({ phone, password, isLogin });
       navigate("/");
-    } catch (err) {
-      // 错误提示已在 mutation 的 onError 中处理
+    } catch {
+      return;
     }
   };
 
   return (
-    <div
-      className={cn(
-        "relative min-h-screen bg-background text-foreground",
-        theme === "dark" && "dark"
-      )}
-    >
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_0%,rgb(0_0_0_/_0.06),transparent_60%)] dark:bg-[radial-gradient(80%_60%_at_50%_0%,rgb(255_255_255_/_0.08),transparent_60%)]" />
-        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(to_right,rgb(0_0_0_/_0.35)_1px,transparent_1px),linear-gradient(to_bottom,rgb(0_0_0_/_0.35)_1px,transparent_1px)] dark:[background-image:linear-gradient(to_right,rgb(255_255_255_/_0.35)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255_/_0.35)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(55%_45%_at_50%_30%,black,transparent)]" />
-      </div>
-
+    <div className="relative min-h-screen bg-background text-foreground">
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
@@ -95,19 +66,6 @@ export function AuthPage() {
                 <div className="text-xs text-muted-foreground">AI 个人知识库</div>
               </div>
             </div>
-
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label="切换主题"
-              onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-            >
-              {theme === "dark" ? (
-                <Sun data-icon="inline-start" />
-              ) : (
-                <Moon data-icon="inline-start" />
-              )}
-            </Button>
           </div>
 
           <Card className="shadow-sm">

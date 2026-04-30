@@ -7,8 +7,8 @@ interface PreferencesContextType {
   setFont: (fontId: string) => void;
   fontSize: string;
   setFontSize: (size: string) => void;
-  darkMode: boolean;
-  setDarkMode: (isDark: boolean) => void;
+  uiTheme: string;
+  setUiTheme: (theme: string) => void;
   notifications: boolean;
   setNotifications: (enabled: boolean) => void;
 }
@@ -31,8 +31,8 @@ export function PreferencesProvider({
     return localStorage.getItem("snapknow-font-size") || "medium";
   });
 
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("snapknow-dark-mode") === "true";
+  const [uiTheme, setUiTheme] = useState(() => {
+    return localStorage.getItem("snapknow-ui-theme") || "paper";
   });
 
   const [notifications, setNotifications] = useState(() => {
@@ -63,9 +63,12 @@ export function PreferencesProvider({
         setFontSize(remoteSize);
         stateChanged = true;
       }
-      if (remoteDarkMode !== undefined && remoteDarkMode !== darkMode) {
-        setDarkMode(remoteDarkMode);
-        stateChanged = true;
+      if (remoteDarkMode !== undefined) {
+        const remoteTheme = remoteDarkMode ? "aurora" : "paper";
+        if (remoteTheme !== uiTheme) {
+          setUiTheme(remoteTheme);
+          stateChanged = true;
+        }
       }
       if (remoteReminders !== undefined && remoteReminders !== notifications) {
         setNotifications(remoteReminders);
@@ -79,22 +82,23 @@ export function PreferencesProvider({
     }
   }, [user, isUserSuccess]); // 仅依赖于获取结果，避免无限循环
 
-  // --- 处理深色模式切换 ---
   useEffect(() => {
     const root = document.documentElement;
-    if (darkMode) {
+    root.setAttribute("data-theme", uiTheme);
+    localStorage.setItem("snapknow-ui-theme", uiTheme);
+
+    const isDark = uiTheme === "aurora";
+    if (isDark) {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
-    localStorage.setItem("snapknow-dark-mode", String(darkMode));
 
-    // 同步到远端
     const token = localStorage.getItem("access_token");
     if (token && !isInitialSyncRef.current) {
-      updatePreferencesMutation.mutate({ dark_mode: darkMode });
+      updatePreferencesMutation.mutate({ dark_mode: isDark });
     }
-  }, [darkMode]);
+  }, [uiTheme]);
 
   // --- 处理通知设置持久化与权限请求 ---
   useEffect(() => {
@@ -165,12 +169,14 @@ export function PreferencesProvider({
 
     // 设置 CSS 变量，确保使用 Tailwind 的地方生效
     root.style.setProperty("--font-sans", selectedFont.family);
+    root.style.setProperty("--font-heading", selectedFont.family);
     // 强制覆盖 document.body 和 html 的字体
     document.body.style.fontFamily = selectedFont.family;
     root.style.fontFamily = selectedFont.family;
 
     // 存储到 localStorage
     localStorage.setItem("snapknow-font", selectedFont.id);
+    localStorage.setItem("snapknow-ui-font", selectedFont.id);
 
     // 动态加载外部字体 (Google Fonts)
     const loadGoogleFont = (urlParam?: string) => {
@@ -211,8 +217,8 @@ export function PreferencesProvider({
         setFont,
         fontSize,
         setFontSize,
-        darkMode,
-        setDarkMode,
+        uiTheme,
+        setUiTheme,
         notifications,
         setNotifications,
       }}

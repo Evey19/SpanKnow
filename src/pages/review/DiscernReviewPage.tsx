@@ -77,19 +77,19 @@ export function DiscernReviewPage() {
       <FocusShell title="辨析模式" onExit={() => navigate("/review")}>
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           {isBusy ? (
-            <div className="text-slate-500">题目加载中...</div>
+            <div className="text-muted-foreground">题目加载中...</div>
           ) : (
             <>
-              <div className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-2">
+              <div className="text-lg font-medium text-foreground mb-2">
                 当前没有需要复习的卡片
               </div>
-              <div className="text-sm text-slate-500 dark:text-slate-400 mb-8">
+              <div className="text-sm text-muted-foreground mb-8">
                 太棒了！你已经完成了当前阶段的学习任务。
               </div>
               <button
                 type="button"
                 onClick={goSummary}
-                className="px-6 py-3 rounded-2xl bg-[#165DFF] text-white font-medium active:scale-95 transition-transform"
+                className="px-6 py-3 rounded-2xl bg-primary text-primary-foreground font-medium active:scale-95 transition-transform"
                 disabled={isBusy}
               >
                 查看统计
@@ -113,7 +113,7 @@ export function DiscernReviewPage() {
           <button
             type="button"
             onClick={() => submit(current)}
-            className="w-full py-3 rounded-2xl bg-[#165DFF] text-white font-medium active:scale-95 transition-transform disabled:opacity-50"
+            className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-medium active:scale-95 transition-transform disabled:opacity-50"
             disabled={isBusy || selected.length === 0}
           >
             提交
@@ -122,7 +122,7 @@ export function DiscernReviewPage() {
           <button
             type="button"
             onClick={next}
-            className="w-full py-3 rounded-2xl bg-[#165DFF] text-white font-medium active:scale-95 transition-transform"
+            className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-medium active:scale-95 transition-transform"
           >
             下一组
           </button>
@@ -131,7 +131,7 @@ export function DiscernReviewPage() {
     >
       <SwipeTransition itemKey={current.id} direction={direction}>
         <QuestionCard prompt={current.question.prompt}>
-          {error && <div className="text-sm text-[#F53F3F] text-center">{error}</div>}
+          {error && <div className="text-sm text-destructive text-center">{error}</div>}
 
           <div className="mt-4 grid gap-2">
             {current.question.options.map((opt) => {
@@ -140,20 +140,20 @@ export function DiscernReviewPage() {
               const isWrong = submitted && isSelected && !current.question.correct_option_ids.includes(opt.id);
 
               const border = isCorrect
-                ? "border-[#00B42A]"
+                ? "border-[color:var(--chart-3)]"
                 : isWrong
-                ? "border-[#F53F3F]"
+                ? "border-destructive"
                 : isSelected
-                ? "border-[#165DFF]"
-                : "border-slate-200 dark:border-slate-700";
+                ? "border-ring"
+                : "border-border";
 
               const bg = isCorrect
-                ? "bg-[#00B42A]/10"
+                ? "bg-[color:var(--chart-3)]/10"
                 : isWrong
-                ? "bg-[#F53F3F]/10"
+                ? "bg-destructive/10"
                 : isSelected
-                ? "bg-[#165DFF]/5"
-                : "bg-white dark:bg-slate-900";
+                ? "bg-accent/40"
+                : "bg-card";
 
               return (
                 <button
@@ -163,17 +163,17 @@ export function DiscernReviewPage() {
                   className={`w-full text-left px-4 py-3 rounded-2xl border ${border} ${bg} active:scale-[0.99] transition-transform`}
                   disabled={isBusy}
                 >
-                  <div className="text-[16px] text-[#1D2129] dark:text-slate-100">{opt.text}</div>
+                  <div className="text-[16px] text-foreground">{opt.text}</div>
                 </button>
               );
             })}
           </div>
 
           {submitted && (
-            <div className="mt-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 p-4">
+            <div className="mt-5 rounded-2xl border border-border bg-muted p-4">
               <div
                 className={`text-sm font-medium ${
-                  correct ? "text-[#00B42A]" : correct === false ? "text-[#F53F3F]" : "text-[#6E7681]"
+                  correct ? "text-[color:var(--chart-3)]" : correct === false ? "text-destructive" : "text-muted-foreground"
                 }`}
               >
                 {correct === undefined ? "已提交" : correct ? "回答正确" : "回答错误"}
@@ -183,15 +183,15 @@ export function DiscernReviewPage() {
                 <div className="mt-3 space-y-3">
                   {current.analysis.compare_table.map((row) => (
                     <div key={row.label}>
-                      <div className="text-xs text-[#6E7681] dark:text-slate-400">{row.label}</div>
+                      <div className="text-xs text-muted-foreground">{row.label}</div>
                       <div className="mt-2 grid gap-2" style={{ gridTemplateColumns: `repeat(${current.items.length}, minmax(0, 1fr))` }}>
                         {current.items.map((it) => (
                           <div
                             key={it.id}
-                            className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3"
+                            className="rounded-xl bg-card border border-border p-3"
                           >
-                            <div className="text-xs font-medium text-[#1D2129] dark:text-slate-100">{it.title}</div>
-                            <div className="mt-1 text-xs text-[#6E7681] dark:text-slate-400 whitespace-pre-wrap">
+                            <div className="text-xs font-medium text-foreground">{it.title}</div>
+                            <div className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap">
                               {row.values[it.id]}
                             </div>
                           </div>
@@ -203,7 +203,7 @@ export function DiscernReviewPage() {
               )}
 
               {current.analysis?.summary && (
-                <div className="mt-3 text-sm text-[#1D2129] dark:text-slate-100 whitespace-pre-wrap">
+                <div className="mt-3 text-sm text-foreground whitespace-pre-wrap">
                   {current.analysis.summary}
                 </div>
               )}

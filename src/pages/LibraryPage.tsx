@@ -19,13 +19,13 @@ function formatDate(date: Date): string {
 function getStatusBadge(status: string) {
   if (status === "published") {
     return (
-      <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+      <span className="px-2 py-0.5 text-xs rounded-full bg-[color:var(--chart-3)]/12 text-[color:var(--chart-3)] border border-[color:var(--chart-3)]/20">
         已发布
       </span>
     );
   }
   return (
-    <span className="px-2 py-0.5 text-xs rounded-full bg-slate-50 text-slate-600 border border-slate-200">
+    <span className="px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground border border-border">
       草稿
     </span>
   );
@@ -77,7 +77,7 @@ export function LibraryPage() {
     <Layout>
       <div className="p-4 lg:p-8 space-y-6">
         <header className="flex items-center justify-between">
-          <h1 className="text-xl lg:text-2xl font-bold text-slate-800">
+          <h1 className="text-xl lg:text-2xl font-bold text-foreground">
             知识库
           </h1>
           <div className="flex gap-2">
@@ -85,8 +85,8 @@ export function LibraryPage() {
               onClick={() => setViewMode("list")}
               className={`p-2 rounded-lg transition-colors ${
                 viewMode === "list"
-                  ? "bg-indigo-100 text-indigo-600"
-                  : "text-slate-400 hover:bg-slate-100"
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground hover:bg-muted"
               }`}
             >
               <List size={20} />
@@ -95,8 +95,8 @@ export function LibraryPage() {
               onClick={() => setViewMode("grid")}
               className={`p-2 rounded-lg transition-colors ${
                 viewMode === "grid"
-                  ? "bg-indigo-100 text-indigo-600"
-                  : "text-slate-400 hover:bg-slate-100"
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground hover:bg-muted"
               }`}
             >
               <Grid size={20} />
@@ -110,11 +110,11 @@ export function LibraryPage() {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="搜索标题..."
-              className="flex-1 px-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              className="flex-1 px-4 py-2 bg-background border border-input rounded-xl focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
             />
             <button
               onClick={() => setPage(1)}
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors"
+              className="px-4 py-2 bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors"
             >
               搜索
             </button>
@@ -131,8 +131,8 @@ export function LibraryPage() {
                   }}
                   className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
                     selectedTags.includes(tag)
-                      ? "bg-indigo-600 text-white"
-                      : "bg-white text-slate-600 border border-slate-200 hover:border-indigo-300"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-card text-muted-foreground border border-border hover:border-ring/50"
                   }`}
                 >
                   {tag}
@@ -143,29 +143,29 @@ export function LibraryPage() {
         </div>
 
         {isLoading ? (
-          <div className="text-center py-16 text-slate-500">加载中...</div>
+          <div className="text-center py-16 text-muted-foreground">加载中...</div>
         ) : error instanceof Error && error.message === "请先登录" ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
-              <Tag className="text-slate-400" size={40} />
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <Tag className="text-muted-foreground" size={40} />
             </div>
-            <p className="text-slate-500 text-lg">请先登录后查看内容</p>
+            <p className="text-muted-foreground text-lg">请先登录后查看内容</p>
             <Link
               to="/auth"
-              className="text-indigo-600 text-sm hover:underline mt-2 inline-block"
+              className="text-primary text-sm hover:underline mt-2 inline-block"
             >
               去登录
             </Link>
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
-              <Tag className="text-slate-400" size={40} />
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <Tag className="text-muted-foreground" size={40} />
             </div>
-            <p className="text-slate-500 text-lg">暂无知识条目</p>
+            <p className="text-muted-foreground text-lg">暂无知识条目</p>
             <Link
               to="/add"
-              className="text-indigo-600 text-sm hover:underline mt-2 inline-block"
+              className="text-primary text-sm hover:underline mt-2 inline-block"
             >
               立即添加
             </Link>
@@ -176,15 +176,15 @@ export function LibraryPage() {
               <Link
                 key={item.id}
                 to={`/item/${item.id}`}
-                className="block bg-white rounded-xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+                className="block bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-4">
                   <div className="mt-1">
-                    <FileText size={16} className="text-slate-500" />
+                    <FileText size={16} className="text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-3 mb-2">
-                      <h3 className="font-semibold text-slate-800 truncate">
+                      <h3 className="font-semibold text-foreground truncate">
                         {item.title}
                       </h3>
                       {getStatusBadge(item.status)}
@@ -194,13 +194,13 @@ export function LibraryPage() {
                         {item.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="px-2.5 py-1 text-xs bg-slate-100 text-slate-600 rounded-full"
+                            className="px-2.5 py-1 text-xs bg-muted text-muted-foreground rounded-full"
                           >
                             {tag}
                           </span>
                         ))}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-slate-400">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock size={12} />
                         {formatDate(new Date(item.created_at))}
                       </div>
@@ -216,25 +216,25 @@ export function LibraryPage() {
               <Link
                 key={item.id}
                 to={`/item/${item.id}`}
-                className="block bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+                className="block bg-card rounded-xl p-4 shadow-sm border border-border hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
-                    <FileText size={16} className="text-slate-500" />
-                    <span className="text-xs text-slate-400">
+                    <FileText size={16} className="text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
                       {formatDate(new Date(item.created_at))}
                     </span>
                   </div>
                   {getStatusBadge(item.status)}
                 </div>
-                <h3 className="font-medium text-slate-800 text-sm line-clamp-2 mb-3">
+                <h3 className="font-medium text-foreground text-sm line-clamp-2 mb-3">
                   {item.title}
                 </h3>
                 <div className="flex flex-wrap gap-1">
                   {item.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded"
+                      className="px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded"
                     >
                       {tag}
                     </span>
@@ -250,17 +250,17 @@ export function LibraryPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg disabled:opacity-50"
+              className="px-3 py-2 text-sm bg-card border border-border rounded-lg disabled:opacity-50"
             >
               上一页
             </button>
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-muted-foreground">
               {page} / {totalPages}
             </div>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg disabled:opacity-50"
+              className="px-3 py-2 text-sm bg-card border border-border rounded-lg disabled:opacity-50"
             >
               下一页
             </button>

@@ -60,19 +60,19 @@ export function RecallReviewPage() {
       <FocusShell title="回忆模式" onExit={() => navigate("/review")}>
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           {isBusy ? (
-            <div className="text-slate-500">题目加载中...</div>
+            <div className="text-muted-foreground">题目加载中...</div>
           ) : (
             <>
-              <div className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-2">
+              <div className="text-lg font-medium text-foreground mb-2">
                 当前没有需要复习的卡片
               </div>
-              <div className="text-sm text-slate-500 dark:text-slate-400 mb-8">
+              <div className="text-sm text-muted-foreground mb-8">
                 太棒了！你已经完成了当前阶段的学习任务。
               </div>
               <button
                 type="button"
                 onClick={goSummary}
-                className="px-6 py-3 rounded-2xl bg-[#165DFF] text-white font-medium active:scale-95 transition-transform"
+                className="px-6 py-3 rounded-2xl bg-primary text-primary-foreground font-medium active:scale-95 transition-transform"
                 disabled={isBusy}
               >
                 查看统计
@@ -91,7 +91,7 @@ export function RecallReviewPage() {
           <button
             type="button"
             onClick={() => submit(current, { revealed_answer: false, decision: "mastered" })}
-            className="flex-1 py-3 rounded-2xl bg-[#00B42A] text-white font-medium active:scale-95 transition-transform disabled:opacity-50"
+            className="flex-1 py-3 rounded-2xl bg-[color:var(--chart-3)] text-primary-foreground font-medium active:scale-95 transition-transform disabled:opacity-50"
             disabled={isBusy}
           >
             我已回忆起来
@@ -99,7 +99,7 @@ export function RecallReviewPage() {
           <button
             type="button"
             onClick={() => setRevealed(true)}
-            className="flex-1 py-3 rounded-2xl bg-[#165DFF] text-white font-medium active:scale-95 transition-transform disabled:opacity-50"
+            className="flex-1 py-3 rounded-2xl bg-primary text-primary-foreground font-medium active:scale-95 transition-transform disabled:opacity-50"
             disabled={isBusy}
           >
             查看答案
@@ -110,7 +110,7 @@ export function RecallReviewPage() {
           <button
             type="button"
             onClick={() => submit(current, { revealed_answer: true, decision: "mastered" })}
-            className="flex-1 py-3 rounded-2xl bg-[#00B42A] text-white font-medium active:scale-95 transition-transform disabled:opacity-50"
+            className="flex-1 py-3 rounded-2xl bg-[color:var(--chart-3)] text-primary-foreground font-medium active:scale-95 transition-transform disabled:opacity-50"
             disabled={isBusy}
           >
             已掌握
@@ -118,7 +118,7 @@ export function RecallReviewPage() {
           <button
             type="button"
             onClick={() => submit(current, { revealed_answer: true, decision: "blurry" })}
-            className="flex-1 py-3 rounded-2xl bg-[#FF7D00] text-white font-medium active:scale-95 transition-transform disabled:opacity-50"
+            className="flex-1 py-3 rounded-2xl bg-[color:var(--chart-4)] text-primary-foreground font-medium active:scale-95 transition-transform disabled:opacity-50"
             disabled={isBusy}
           >
             仍模糊
@@ -142,17 +142,17 @@ export function RecallReviewPage() {
       >
         <QuestionCard prompt={current.prompt}>
           {current.explanation && (
-            <div className="text-xs text-[#6E7681] dark:text-slate-400 text-center whitespace-pre-wrap">
+            <div className="text-xs text-muted-foreground text-center whitespace-pre-wrap">
               来自：{current.explanation}
             </div>
           )}
           {error && (
-            <div className="text-sm text-[#F53F3F] text-center">{error}</div>
+            <div className="text-sm text-destructive text-center">{error}</div>
           )}
           {revealed && (
-            <div className="mt-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm font-medium text-[#1D2129] dark:text-slate-100">答案</div>
-              <div className="mt-2 text-[16px] text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
+            <div className="mt-4 rounded-xl bg-muted border border-border p-4">
+              <div className="text-sm font-medium text-foreground">答案</div>
+              <div className="mt-2 text-[16px] text-foreground whitespace-pre-wrap">
                 {current.answer}
               </div>
             </div>

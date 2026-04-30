@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import {
   ArrowLeft,
-  Moon,
-  Sun,
   Bell,
   Globe,
   Trash2,
@@ -12,6 +10,7 @@ import {
   Scaling,
   Camera,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import { Layout } from "../components/Layout";
 import { usePreferences } from "../contexts/PreferencesContext";
@@ -21,8 +20,8 @@ import { FONTS } from "../lib/fonts";
 
 export function SettingsPage() {
   const {
-    darkMode,
-    setDarkMode,
+    uiTheme,
+    setUiTheme,
     notifications,
     setNotifications,
     font,
@@ -42,17 +41,20 @@ export function SettingsPage() {
 
   // We still fallback to local storage if remote data is missing or loading
   const userStr = localStorage.getItem("user");
-  let localUser: any = null;
+  type LocalUser = { avatar?: string | null; avatar_url?: string | null; username?: string | null; phone?: string | null };
+  let localUser: LocalUser | null = null;
   if (userStr) {
     try {
-      localUser = JSON.parse(userStr);
-    } catch {}
+      localUser = JSON.parse(userStr) as LocalUser;
+    } catch {
+      localUser = null;
+    }
   }
   
   const user = serverProfile || localUser;
 
   const [localAvatar, setLocalAvatar] = useState<string | null>(
-    user?.avatar || user?.avatar_url || null,
+    localUser?.avatar || localUser?.avatar_url || serverProfile?.avatar_url || null,
   );
   const [username, setUsername] = useState<string>(user?.username || "");
 
@@ -74,8 +76,11 @@ export function SettingsPage() {
         const updatedUserStr = localStorage.getItem("user");
         if (updatedUserStr) {
           try {
-            setLocalAvatar(JSON.parse(updatedUserStr).avatar);
-          } catch {}
+            const updatedUser = JSON.parse(updatedUserStr) as LocalUser;
+            setLocalAvatar(updatedUser.avatar || updatedUser.avatar_url || null);
+          } catch {
+            setLocalAvatar(null);
+          }
         }
       },
     });
@@ -107,22 +112,22 @@ export function SettingsPage() {
         <header className="flex items-center gap-3 mb-6">
           <Link
             to="/"
-            className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+            className="p-2 -ml-2 hover:bg-muted rounded-lg"
           >
             <ArrowLeft
               size={20}
-              className="text-slate-600 dark:text-slate-400"
+              className="text-muted-foreground"
             />
           </Link>
-          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">
+          <h1 className="text-xl font-bold text-foreground">
             设置
           </h1>
         </header>
 
         <section>
-          <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/60 shadow-sm mb-8">
-            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.22),transparent_60%)]" />
-            <div className="absolute -bottom-28 -left-24 w-80 h-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.12),transparent_60%)]" />
+          <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 shadow-sm mb-8">
+            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[radial-gradient(circle_at_center,var(--chart-1),transparent_60%)] opacity-25" />
+            <div className="absolute -bottom-28 -left-24 w-80 h-80 rounded-full bg-[radial-gradient(circle_at_center,var(--chart-3),transparent_60%)] opacity-15" />
 
             <div className="relative p-6 md:p-7 flex flex-col md:flex-row items-center md:items-start gap-6">
               <div className="flex flex-col items-center md:items-start gap-3">
@@ -130,8 +135,8 @@ export function SettingsPage() {
                   className="relative group cursor-pointer"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-indigo-500/40 via-indigo-400/20 to-emerald-400/30 blur opacity-70 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 border-4 border-white/90 dark:border-slate-950 shadow-lg flex items-center justify-center overflow-hidden">
+                  <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[var(--chart-1)] via-[var(--chart-4)] to-[var(--chart-3)] blur opacity-40 group-hover:opacity-70 transition-opacity" />
+                  <div className="relative w-24 h-24 rounded-full bg-muted border-4 border-background/80 shadow-lg flex items-center justify-center overflow-hidden">
                     {localAvatar ? (
                       <img
                         src={localAvatar}
@@ -139,12 +144,12 @@ export function SettingsPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-3xl font-black text-slate-400 dark:text-slate-600 tracking-tight">
+                      <span className="text-3xl font-black text-muted-foreground tracking-tight">
                         {user?.phone ? user.phone.slice(-4) : "U"}
                       </span>
                     )}
 
-                    <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                    <div className="absolute inset-0 bg-overlay/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-overlay-foreground">
                       {isUploadingAvatar ? (
                         <Loader2 size={22} className="animate-spin" />
                       ) : (
@@ -163,18 +168,18 @@ export function SettingsPage() {
                 </div>
 
                 <div className="text-center md:text-left">
-                  <div className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+                  <div className="text-xl font-extrabold text-foreground tracking-tight">
                     {username?.trim() || "未设置用户名"}
                   </div>
-                  <div className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                  <div className="mt-1 text-sm font-medium text-muted-foreground">
                     {user?.phone ? `+86 ${user.phone}` : "未登录用户"}
                   </div>
                 </div>
               </div>
 
               <div className="flex-1 w-full md:w-auto">
-                <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-950/30 p-4 md:p-5">
-                  <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase">
+                <div className="rounded-2xl border border-border/60 bg-background/60 p-4 md:p-5">
+                  <div className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">
                     个人资料
                   </div>
                   <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -182,14 +187,14 @@ export function SettingsPage() {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="设置用户名"
-                      className="flex-1 h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100 text-sm font-semibold outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-shadow"
+                      className="flex-1 h-11 px-4 rounded-xl border border-input bg-background/80 text-foreground text-sm font-semibold outline-none focus:border-ring focus:ring-4 focus:ring-ring/20 transition-shadow"
                       disabled={isUpdatingProfile}
                     />
                     <button
                       type="button"
                       onClick={handleSaveProfile}
                       disabled={isUpdatingProfile || !username.trim()}
-                      className="h-11 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20"
+                      className="h-11 px-5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md"
                     >
                       {isUpdatingProfile && (
                         <Loader2 size={16} className="animate-spin" />
@@ -197,7 +202,7 @@ export function SettingsPage() {
                       保存
                     </button>
                   </div>
-                  <div className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                  <div className="mt-3 text-xs text-muted-foreground">
                     点击头像可更换；用户名用于在复习与成就中展示。
                   </div>
                 </div>
@@ -207,79 +212,76 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground mb-3 px-1">
             外观
           </h2>
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-            >
+          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+            <div className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors">
               <div className="flex items-center gap-3">
-                {darkMode ? (
-                  <Moon size={20} className="text-indigo-400" />
-                ) : (
-                  <Sun size={20} className="text-amber-500" />
-                )}
-                <span className="text-slate-700 dark:text-slate-300">
-                  深色模式
+                <Sparkles size={20} className="text-primary" />
+                <span className="text-foreground">
+                  主题风格
                 </span>
               </div>
-              <div
-                className={`w-11 h-6 rounded-full transition-colors ${
-                  darkMode ? "bg-indigo-600" : "bg-slate-200 dark:bg-slate-700"
-                }`}
+              <select
+                value={uiTheme}
+                onChange={(e) => setUiTheme(e.target.value)}
+                className="bg-transparent text-muted-foreground text-sm font-medium outline-none cursor-pointer hover:text-foreground transition-colors"
               >
-                <div
-                  className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform mt-0.5 ${
-                    darkMode ? "translate-x-5 ml-0.5" : "translate-x-0.5"
-                  }`}
-                />
-              </div>
-            </button>
-            <div className="border-t border-slate-100 dark:border-slate-800" />
-            <div className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <option value="paper" className="bg-popover">
+                  纸墨
+                </option>
+                <option value="sage" className="bg-popover">
+                  护眼
+                </option>
+                <option value="aurora" className="bg-popover">
+                  极光
+                </option>
+              </select>
+            </div>
+            <div className="border-t border-border" />
+            <div className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors">
               <div className="flex items-center gap-3">
-                <Type size={20} className="text-blue-500" />
-                <span className="text-slate-700 dark:text-slate-300">
+                <Type size={20} className="text-primary" />
+                <span className="text-foreground">
                   全局字体
                 </span>
               </div>
               <select
                 value={font}
                 onChange={(e) => setFont(e.target.value)}
-                className="bg-transparent text-slate-500 dark:text-slate-400 text-sm font-medium outline-none cursor-pointer hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                className="bg-transparent text-muted-foreground text-sm font-medium outline-none cursor-pointer hover:text-foreground transition-colors"
               >
                 {FONTS.map((f) => (
-                  <option key={f.id} value={f.id} className="dark:bg-slate-800">
+                  <option key={f.id} value={f.id} className="bg-popover">
                     {f.name}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="border-t border-slate-100 dark:border-slate-800" />
-            <div className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            <div className="border-t border-border" />
+            <div className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors">
               <div className="flex items-center gap-3">
-                <Scaling size={20} className="text-emerald-500" />
-                <span className="text-slate-700 dark:text-slate-300">
+                <Scaling size={20} className="text-primary" />
+                <span className="text-foreground">
                   字体大小
                 </span>
               </div>
               <select
                 value={fontSize}
                 onChange={(e) => setFontSize(e.target.value)}
-                className="bg-transparent text-slate-500 dark:text-slate-400 text-sm font-medium outline-none cursor-pointer hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                className="bg-transparent text-muted-foreground text-sm font-medium outline-none cursor-pointer hover:text-foreground transition-colors"
               >
-                <option value="small" className="dark:bg-slate-800">
+                <option value="small" className="bg-popover">
                   小
                 </option>
-                <option value="medium" className="dark:bg-slate-800">
+                <option value="medium" className="bg-popover">
                   中 (默认)
                 </option>
-                <option value="large" className="dark:bg-slate-800">
+                <option value="large" className="bg-popover">
                   大
                 </option>
-                <option value="xlarge" className="dark:bg-slate-800">
+                <option value="xlarge" className="bg-popover">
                   特大
                 </option>
               </select>
@@ -288,10 +290,10 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground mb-3 px-1">
             通知
           </h2>
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
             <button
               onClick={() => {
                 if (
@@ -306,26 +308,26 @@ export function SettingsPage() {
                 }
                 setNotifications(!notifications);
               }}
-              className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+              className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors"
             >
               <div className="flex items-center gap-3">
                 <Bell
                   size={20}
-                  className="text-slate-400 dark:text-slate-500"
+                  className="text-muted-foreground"
                 />
-                <span className="text-slate-700 dark:text-slate-300">
+                <span className="text-foreground">
                   复习提醒 (浏览器推送)
                 </span>
               </div>
               <div
                 className={`w-11 h-6 rounded-full transition-colors ${
                   notifications
-                    ? "bg-indigo-600"
-                    : "bg-slate-200 dark:bg-slate-700"
+                    ? "bg-primary"
+                    : "bg-muted"
                 }`}
               >
                 <div
-                  className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform mt-0.5 ${
+                  className={`w-5 h-5 bg-background rounded-full shadow transform transition-transform mt-0.5 ${
                     notifications ? "translate-x-5 ml-0.5" : "translate-x-0.5"
                   }`}
                 />
@@ -335,64 +337,64 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground mb-3 px-1">
             数据管理
           </h2>
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
-            <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+            <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors">
               <div className="flex items-center gap-3">
                 <Globe
                   size={20}
-                  className="text-slate-400 dark:text-slate-500"
+                  className="text-muted-foreground"
                 />
-                <span className="text-slate-700 dark:text-slate-300">
+                <span className="text-foreground">
                   数据同步
                 </span>
               </div>
               <ChevronRight
                 size={20}
-                className="text-slate-400 dark:text-slate-500"
+                className="text-muted-foreground"
               />
             </button>
-            <div className="border-t border-slate-100 dark:border-slate-800" />
+            <div className="border-t border-border" />
             <button
               onClick={() => logout()}
               disabled={isLoggingOut}
-              className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors disabled:opacity-50"
+              className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
                 {isLoggingOut ? (
-                  <Loader2 size={20} className="text-red-500 dark:text-red-400 animate-spin" />
+                  <Loader2 size={20} className="text-destructive animate-spin" />
                 ) : (
-                  <Trash2 size={20} className="text-red-500 dark:text-red-400" />
+                  <Trash2 size={20} className="text-destructive" />
                 )}
-                <span className="text-red-600 dark:text-red-400">
+                <span className="text-destructive">
                   {isLoggingOut ? "正在退出..." : "退出登录"}
                 </span>
               </div>
               <ChevronRight
                 size={20}
-                className="text-slate-400 dark:text-slate-500"
+                className="text-muted-foreground"
               />
             </button>
           </div>
         </section>
 
         <section>
-          <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground mb-3 px-1">
             关于
           </h2>
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
             <div className="px-4 py-3 flex items-center justify-between">
-              <span className="text-slate-700 dark:text-slate-300">版本</span>
-              <span className="text-slate-400 dark:text-slate-500">v1.0.0</span>
+              <span className="text-foreground">版本</span>
+              <span className="text-muted-foreground">v1.0.0</span>
             </div>
-            <div className="border-t border-slate-100 dark:border-slate-800" />
-            <div className="px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
-              <span className="text-slate-700 dark:text-slate-300">反馈</span>
+            <div className="border-t border-border" />
+            <div className="px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors cursor-pointer">
+              <span className="text-foreground">反馈</span>
               <ChevronRight
                 size={20}
-                className="text-slate-400 dark:text-slate-500"
+                className="text-muted-foreground"
               />
             </div>
           </div>

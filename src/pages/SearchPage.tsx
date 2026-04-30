@@ -82,7 +82,7 @@ export function SearchPage() {
       <div className="p-4 lg:p-8 space-y-6">
         <form onSubmit={handleSearch} className="relative">
           <SearchIcon
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
             size={20}
           />
           <input
@@ -90,14 +90,14 @@ export function SearchPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="搜索标题、内容、标签..."
-            className="w-full pl-12 pr-12 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            className="w-full pl-12 pr-12 py-3 bg-background border border-input rounded-xl focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
             autoFocus
           />
           {query && (
             <button
               type="button"
               onClick={clearSearch}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X size={20} />
             </button>
@@ -110,8 +110,8 @@ export function SearchPage() {
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
-                    <Clock size={16} className="text-slate-400" />
-                    <h3 className="text-sm font-medium text-slate-600">
+                    <Clock size={16} className="text-muted-foreground" />
+                    <h3 className="text-sm font-medium text-foreground">
                       搜索历史
                     </h3>
                   </div>
@@ -119,7 +119,7 @@ export function SearchPage() {
                     onClick={() => {
                       setSearchHistory([]);
                     }}
-                    className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1"
+                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
                   >
                     <Trash2 size={12} />
                     清除
@@ -130,7 +130,7 @@ export function SearchPage() {
                     <div key={keyword} className="relative">
                       <button
                         onClick={() => handleHistoryClick(keyword)}
-                        className="px-3 py-1.5 text-sm bg-white border border-slate-200 rounded-full text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+                        className="px-3 py-1.5 text-sm bg-card border border-border rounded-full text-muted-foreground hover:border-ring/50 hover:text-foreground transition-colors"
                       >
                         {keyword}
                       </button>
@@ -138,7 +138,7 @@ export function SearchPage() {
                         onClick={(e) => {
                           e.stopPropagation();
                         }}
-                        className="absolute -top-1 -right-1 p-0.5 bg-white rounded-full border border-slate-200 text-slate-400 hover:text-red-500 transition-colors"
+                        className="absolute -top-1 -right-1 p-0.5 bg-card rounded-full border border-border text-muted-foreground hover:text-destructive transition-colors"
                       >
                         <X size={10} />
                       </button>
@@ -150,8 +150,8 @@ export function SearchPage() {
 
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Tag size={16} className="text-slate-400" />
-                <h3 className="text-sm font-medium text-slate-600">热门标签</h3>
+                <Tag size={16} className="text-muted-foreground" />
+                <h3 className="text-sm font-medium text-foreground">热门标签</h3>
               </div>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -167,7 +167,7 @@ export function SearchPage() {
                   <button
                     key={tag}
                     onClick={() => handleHistoryClick(tag)}
-                    className="px-3 py-1.5 text-sm bg-slate-100 text-slate-600 rounded-full hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
+                    className="px-3 py-1.5 text-sm bg-muted text-muted-foreground rounded-full hover:bg-accent hover:text-accent-foreground transition-colors"
                   >
                     {tag}
                   </button>
@@ -176,37 +176,37 @@ export function SearchPage() {
             </div>
 
             <div className="text-center py-8">
-              <SearchIcon className="mx-auto text-slate-300 mb-3" size={40} />
-              <p className="text-slate-500">输入关键词搜索知识库</p>
+              <SearchIcon className="mx-auto text-muted-foreground/50 mb-3" size={40} />
+              <p className="text-muted-foreground">输入关键词搜索知识库</p>
             </div>
           </div>
         ) : query.trim() === "" ? (
           <div className="text-center py-8">
-            <SearchIcon className="mx-auto text-slate-300 mb-3" size={40} />
-            <p className="text-slate-500">请输入搜索关键词</p>
+            <SearchIcon className="mx-auto text-muted-foreground/50 mb-3" size={40} />
+            <p className="text-muted-foreground">请输入搜索关键词</p>
           </div>
         ) : loading ? (
           <div className="text-center py-8">
             <Loader2
-              className="mx-auto text-indigo-500 mb-3 animate-spin"
+              className="mx-auto text-primary mb-3 animate-spin"
               size={40}
             />
-            <p className="text-slate-500">搜索中...</p>
+            <p className="text-muted-foreground">搜索中...</p>
           </div>
         ) : error ? (
           <div className="text-center py-8">
-            <SearchIcon className="mx-auto text-red-400 mb-3" size={40} />
-            <p className="text-red-500 mb-4">{error}</p>
+            <SearchIcon className="mx-auto text-destructive mb-3" size={40} />
+            <p className="text-destructive mb-4">{error}</p>
             <button
               onClick={handleSearch}
-              className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               重试
             </button>
           </div>
         ) : (
           <div>
-            <p className="text-sm text-slate-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               找到 {results.length} 个结果
             </p>
             <div className="space-y-3">
@@ -214,12 +214,12 @@ export function SearchPage() {
                 <Link
                   key={item.id}
                   to={`/item/${item.id}`}
-                  className="block bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+                  className="block bg-card rounded-xl p-4 shadow-sm border border-border hover:shadow-md transition-shadow"
                 >
-                  <h3 className="font-medium text-slate-800 mb-1">
+                  <h3 className="font-medium text-foreground mb-1">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-slate-500 line-clamp-2 mb-2">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                     {item.summary}
                   </p>
                   <div className="flex items-center justify-between">
@@ -227,13 +227,13 @@ export function SearchPage() {
                       {item.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-full"
+                          className="px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-muted-foreground">
                       {formatDate(new Date(item.createdAt))}
                     </span>
                   </div>

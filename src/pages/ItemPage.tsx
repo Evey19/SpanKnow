@@ -21,6 +21,7 @@ import { useUpdateContentMutation } from "@/features/contents/useUpdateContentMu
 import { toast } from "sonner";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { DismantleResultView } from "@/components/DismantleResultView";
+import { normalizePipeTablesHtml } from "@/lib/normalizePipeTablesHtml";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,13 +45,13 @@ function formatDate(date: Date): string {
 function getStatusBadge(status: string) {
   if (status === "published") {
     return (
-      <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+      <span className="px-2 py-0.5 text-xs rounded-full bg-[color:var(--chart-3)]/12 text-[color:var(--chart-3)] border border-[color:var(--chart-3)]/20">
         已发布
       </span>
     );
   }
   return (
-    <span className="px-2 py-0.5 text-xs rounded-full bg-slate-50 text-slate-600 border border-slate-200">
+    <span className="px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground border border-border">
       草稿
     </span>
   );
@@ -126,8 +127,8 @@ export function ItemPage() {
         tags: finalTags,
       });
       setIsEditing(false);
-    } catch (err: any) {
-      if (err.message === "请先登录") {
+    } catch (err) {
+      if (err instanceof Error && err.message === "请先登录") {
         navigate("/auth");
       }
     }
@@ -142,7 +143,8 @@ export function ItemPage() {
 
   const safeHtml = useMemo(() => {
     if (!data?.content) return "";
-    return DOMPurify.sanitize(data.content, { USE_PROFILES: { html: true } });
+    const normalized = normalizePipeTablesHtml(data.content);
+    return DOMPurify.sanitize(normalized, { USE_PROFILES: { html: true } });
   }, [data?.content]);
 
   const plainText = useMemo(() => {
@@ -170,9 +172,9 @@ export function ItemPage() {
                 navigate(-1);
               }
             }}
-            className="p-2 -ml-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 -ml-2 hover:bg-muted rounded-lg transition-colors"
           >
-            <ArrowLeft size={20} className="text-slate-600" />
+            <ArrowLeft size={20} className="text-muted-foreground" />
           </button>
           <div className="flex-1" />
           
@@ -180,22 +182,22 @@ export function ItemPage() {
             <>
               <button 
                 onClick={() => setIsEditing(true)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors" 
+                className="p-2 hover:bg-muted rounded-lg transition-colors" 
                 title="编辑"
               >
-                <Edit size={20} className="text-slate-600" />
+                <Edit size={20} className="text-muted-foreground" />
               </button>
-              <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors" title="分享">
-                <Share2 size={20} className="text-slate-600" />
+              <button className="p-2 hover:bg-muted rounded-lg transition-colors" title="分享">
+                <Share2 size={20} className="text-muted-foreground" />
               </button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <button 
-                    className="p-2 hover:bg-red-50 rounded-lg transition-colors" 
+                    className="p-2 hover:bg-destructive/10 rounded-lg transition-colors" 
                     title="删除"
                     disabled={isDeleting}
                   >
-                    <Trash2 size={20} className={isDeleting ? "text-red-300" : "text-red-500"} />
+                    <Trash2 size={20} className={isDeleting ? "text-destructive/40" : "text-destructive"} />
                   </button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -209,7 +211,7 @@ export function ItemPage() {
                     <AlertDialogCancel>取消</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => id && deleteContent(id)}
-                      className="bg-red-500 hover:bg-red-600 text-white"
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                     >
                       {isDeleting ? "删除中..." : "确认删除"}
                     </AlertDialogAction>
@@ -223,7 +225,7 @@ export function ItemPage() {
             <button
               onClick={handleSave}
               disabled={isUpdating}
-              className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors disabled:opacity-50"
             >
               <Save size={16} />
               {isUpdating ? "保存中..." : "保存修改"}
@@ -232,26 +234,26 @@ export function ItemPage() {
         </header>
 
         {isLoading ? (
-          <div className="text-center py-16 text-slate-500">加载中...</div>
+          <div className="text-center py-16 text-muted-foreground">加载中...</div>
         ) : error instanceof Error && error.message === "请先登录" ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
-              <Tag className="text-slate-400" size={40} />
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <Tag className="text-muted-foreground" size={40} />
             </div>
-            <p className="text-slate-500 text-lg">请先登录后查看内容</p>
+            <p className="text-muted-foreground text-lg">请先登录后查看内容</p>
             <Link
               to="/auth"
-              className="text-indigo-600 text-sm hover:underline mt-2 inline-block"
+              className="text-primary text-sm hover:underline mt-2 inline-block"
             >
               去登录
             </Link>
           </div>
         ) : !data ? (
-          <div className="text-center py-16 text-slate-500">内容不存在</div>
+          <div className="text-center py-16 text-muted-foreground">内容不存在</div>
         ) : isEditing ? (
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-4">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 标题
               </label>
               <input
@@ -259,22 +261,22 @@ export function ItemPage() {
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 placeholder="输入标题..."
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 mb-4"
+                className="w-full px-4 py-3 bg-background border border-input rounded-xl focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground mb-4"
               />
 
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 标签
               </label>
               <div className="flex gap-2 mb-2 flex-wrap">
                 {editTags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-accent text-accent-foreground rounded-full text-sm"
                   >
                     {tag}
                     <button
                       onClick={() => removeTag(tag)}
-                      className="hover:text-indigo-900"
+                      className="hover:opacity-80"
                     >
                       <X size={14} />
                     </button>
@@ -290,17 +292,17 @@ export function ItemPage() {
                     e.key === "Enter" && (e.preventDefault(), handleAddTag())
                   }
                   placeholder="可添加多个标签（多个标签请使用逗号、空格、顿号分隔）"
-                  className="flex-1 px-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                  className="flex-1 px-4 py-2 bg-background border border-input rounded-xl focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground"
                 />
                 <button
                   onClick={handleAddTag}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors"
+                  className="px-4 py-2 bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors"
                 >
                   添加
                 </button>
               </div>
 
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 内容
               </label>
               <RichTextEditor
@@ -308,15 +310,15 @@ export function ItemPage() {
                 onChange={setEditContent}
                 placeholder="输入内容..."
                 disabled={isUpdating}
-                className="bg-white rounded-xl"
+                className="bg-card rounded-xl"
               />
             </div>
           </div>
         ) : (
-          <article className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <article className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
             <div className="p-4">
               <div className="flex items-start justify-between gap-3 mb-3">
-                <h1 className="text-xl font-bold text-slate-800 break-words">{data.title}</h1>
+                <h1 className="text-xl font-bold text-foreground break-words">{data.title}</h1>
                 <div className="shrink-0">{getStatusBadge(data.status)}</div>
               </div>
 
@@ -324,14 +326,14 @@ export function ItemPage() {
                 {data.tags?.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2.5 py-1 text-xs bg-indigo-50 text-indigo-600 rounded-full"
+                    className="px-2.5 py-1 text-xs bg-accent text-accent-foreground rounded-full"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
 
-              <div className="flex items-center gap-4 text-xs text-slate-400 mb-4">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
                 <span className="flex items-center gap-1">
                   <Clock size={12} />
                   {formatDate(new Date(data.created_at))}
@@ -345,7 +347,7 @@ export function ItemPage() {
               </div>
 
               <div
-                className="tiptap max-w-none text-slate-700 break-words"
+                className="tiptap max-w-none break-words"
                 dangerouslySetInnerHTML={{ __html: safeHtml }}
               />
             </div>
@@ -361,10 +363,10 @@ export function ItemPage() {
             <button
               onClick={handleCopy}
               disabled={!data}
-              className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-card border border-border text-foreground rounded-xl font-medium hover:bg-muted transition-colors flex items-center justify-center gap-2"
             >
               {copied ? (
-                <Check size={18} className="text-green-500" />
+                <Check size={18} className="text-[color:var(--chart-3)]" />
               ) : (
                 <Copy size={18} />
               )}
@@ -372,7 +374,7 @@ export function ItemPage() {
             </button>
             <Link
               to="/review"
-              className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors text-center"
+              className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors text-center"
             >
               开始复习
             </Link>

@@ -35,7 +35,7 @@ export function CountdownRing({
           stroke="currentColor"
           strokeWidth={strokeWidth}
           fill="transparent"
-          className="text-slate-200 dark:text-slate-800"
+          className="text-muted"
         />
         <circle
           cx={size / 2}
@@ -46,11 +46,10 @@ export function CountdownRing({
           fill="transparent"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className={`transition-all duration-[250ms] ease-linear ${!color && "text-[#165DFF]"}`}
+          className={`transition-all duration-[250ms] ease-linear ${!color && "text-primary"}`}
         />
       </svg>
       {center && <div className="absolute inset-0 flex items-center justify-center">{center}</div>}
     </div>
   );
 }
-

@@ -75,7 +75,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: cn(
-          "tiptap min-h-32 w-full rounded-b-xl border border-t-0 border-input bg-white dark:bg-zinc-950/50 px-4 py-4 text-base outline-none focus-within:bg-slate-50/50 dark:focus-within:bg-zinc-900/20 transition-colors",
+          "tiptap min-h-32 w-full rounded-b-xl border border-t-0 border-input bg-background px-4 py-4 text-base outline-none focus-within:bg-muted/50 transition-colors",
           compact && "min-h-24 py-3"
         ),
       },
@@ -97,7 +97,7 @@ export function RichTextEditor({
   return (
     <div className={cn("flex flex-col shadow-sm rounded-xl", className)}>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 rounded-t-xl border border-input bg-slate-50 dark:bg-zinc-900/80 px-2 py-1.5 sticky top-0 z-10">
+      <div className="flex flex-wrap items-center gap-1 rounded-t-xl border border-input bg-muted/60 px-2 py-1.5 sticky top-0 z-10">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -105,8 +105,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("bold") && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("bold") && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleBold().run()}
@@ -124,8 +124,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("italic") && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("italic") && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleItalic().run()}
@@ -143,8 +143,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("strike") && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("strike") && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleStrike().run()}
@@ -161,7 +161,7 @@ export function RichTextEditor({
               type="button"
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()}
             >
@@ -171,7 +171,7 @@ export function RichTextEditor({
           <TooltipContent>清除格式</TooltipContent>
         </Tooltip>
         
-        <div className="mx-1 h-4 w-px bg-slate-300 dark:bg-zinc-700" />
+        <div className="mx-1 h-4 w-px bg-border" />
         
         <Tooltip>
           <TooltipTrigger asChild>
@@ -180,8 +180,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("heading", { level: 1 }) && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("heading", { level: 1 }) && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -199,8 +199,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("heading", { level: 2 }) && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("heading", { level: 2 }) && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
@@ -218,8 +218,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("heading", { level: 3 }) && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("heading", { level: 3 }) && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
@@ -237,8 +237,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("heading", { level: 4 }) && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("heading", { level: 4 }) && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 4 }).run()}
@@ -256,8 +256,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("heading", { level: 5 }) && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("heading", { level: 5 }) && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 5 }).run()}
@@ -275,8 +275,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("heading", { level: 6 }) && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("heading", { level: 6 }) && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 6 }).run()}
@@ -294,7 +294,7 @@ export function RichTextEditor({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors relative"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors relative"
                 disabled={disabled || !editor}
               >
                 <Highlighter size={16} />
@@ -316,7 +316,7 @@ export function RichTextEditor({
           <TooltipContent>文本颜色</TooltipContent>
         </Tooltip>
 
-        <div className="mx-1 h-4 w-px bg-slate-300 dark:bg-zinc-700" />
+        <div className="mx-1 h-4 w-px bg-border" />
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -325,8 +325,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("bulletList") && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("bulletList") && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleBulletList().run()}
@@ -344,8 +344,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("orderedList") && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("orderedList") && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleOrderedList().run()}
@@ -356,7 +356,7 @@ export function RichTextEditor({
           <TooltipContent>有序列表 (⌘⇧7)</TooltipContent>
         </Tooltip>
         
-        <div className="mx-1 h-4 w-px bg-slate-300 dark:bg-zinc-700" />
+        <div className="mx-1 h-4 w-px bg-border" />
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -365,8 +365,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("blockquote") && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("blockquote") && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleBlockquote().run()}
@@ -384,8 +384,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("codeBlock") && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("codeBlock") && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
@@ -403,8 +403,8 @@ export function RichTextEditor({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors",
-                editor?.isActive("link") && "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/70"
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                editor?.isActive("link") && "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
               disabled={disabled || !editor}
               onClick={() => {

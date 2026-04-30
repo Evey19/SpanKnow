@@ -101,7 +101,7 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
     });
   };
 
-  const handleAddReview = (card: any) => {
+  const handleAddReview = (card: { cardId: string | number; question: string; content: string; summary?: string; analogy?: string; mnemonic?: string }) => {
     const isConfusable = typeof card.cardId === 'string' && card.cardId.startsWith('confusable_');
     const cardIdStr = String(card.cardId);
     addReviewCards({
@@ -128,8 +128,8 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
 
   if (!hasDismantled) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-slate-500 border-t border-slate-100 mt-8 pt-8">
-        <Sparkles className={`w-8 h-8 mb-4 ${isDismantled ? "text-green-500" : "text-indigo-400"}`} />
+      <div className="flex flex-col items-center justify-center p-8 text-muted-foreground border-t border-border mt-8 pt-8">
+        <Sparkles className={`w-8 h-8 mb-4 ${isDismantled ? "text-[color:var(--chart-3)]" : "text-primary"}`} />
         <p className="mb-4">
           {isDismantled ? "这篇内容已进行过知识拆解" : "这篇内容还没有进行知识拆解"}
         </p>
@@ -137,8 +137,8 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
           <button
             onClick={handleDismantle}
             disabled={!textContent || isPending}
-            className={`px-6 py-2 text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-              isDismantled ? "bg-green-600 hover:bg-green-700" : "bg-indigo-600 hover:bg-indigo-700"
+            className={`px-6 py-2 text-primary-foreground rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+              isDismantled ? "bg-[color:var(--chart-3)] hover:opacity-90" : "bg-primary hover:bg-primary/90"
             }`}
           >
             {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
@@ -148,7 +148,7 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
             <button
               onClick={handleForceDismantle}
               disabled={!textContent || isPending}
-              className="px-6 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-card border border-border text-foreground rounded-lg hover:bg-muted transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
               重新拆解
@@ -161,7 +161,7 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
 
   if (isPending) {
     return (
-      <div className="flex items-center justify-center p-8 text-slate-500">
+      <div className="flex items-center justify-center p-8 text-muted-foreground">
         <Loader2 className="w-6 h-6 animate-spin mr-2" />
         正在拆解内容...
       </div>
@@ -170,14 +170,14 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
 
   if (isError) {
     return (
-      <div className="p-4 bg-red-50 text-red-600 rounded-xl flex items-start gap-3 mt-8">
+      <div className="p-4 bg-destructive/10 text-destructive rounded-xl flex items-start gap-3 mt-8">
         <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
         <div>
           <h4 className="font-medium">无法加载拆解结果</h4>
           <p className="text-sm mt-1">{error?.message || "未知错误"}</p>
           <button 
             onClick={handleDismantle}
-            className="mt-3 px-4 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm transition-colors"
+            className="mt-3 px-4 py-1.5 bg-destructive/15 hover:bg-destructive/20 text-destructive rounded-lg text-sm transition-colors"
           >
             重试
           </button>
@@ -191,17 +191,17 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
   const result = data.data;
 
   return (
-    <div className="space-y-6 mt-8 border-t pt-8 border-slate-100">
+    <div className="space-y-6 mt-8 border-t pt-8 border-border">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h3 className="text-lg font-bold flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-indigo-500" />
+          <Sparkles className="w-5 h-5 text-primary" />
           AI 知识拆解
         </h3>
         <div className="flex items-center gap-3">
           <button
             onClick={handleForceDismantle}
             disabled={!textContent || isPending}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 text-sm rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border text-foreground text-sm rounded-lg hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
             重新拆解
@@ -210,10 +210,10 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
             <>
               <button
                 onClick={handleToggleSelectAll}
-                className="flex items-center gap-1.5 text-sm text-slate-600 hover:text-indigo-600 transition-colors"
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {selectedIds.size > 0 && selectedIds.size === allCards.filter(c => !c.is_in_user_cards && !addedCardIds.has(c.id)).length ? (
-                  <CheckSquare className="w-4 h-4 text-indigo-500" />
+                  <CheckSquare className="w-4 h-4 text-primary" />
                 ) : (
                   <Square className="w-4 h-4" />
                 )}
@@ -222,7 +222,7 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
               <button
                 onClick={handleBatchAddReview}
                 disabled={selectedIds.size === 0 || isAddingReview}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isAddingReview ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 批量加入复习 ({selectedIds.size})
@@ -234,31 +234,31 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
 
       {result.knowledge_card_list && result.knowledge_card_list.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-slate-700 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-slate-400" />
+          <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+            <Layers className="w-4 h-4 text-muted-foreground" />
             知识卡片
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {result.knowledge_card_list.map((card) => {
               const isCardInUserCards = card.is_in_user_cards || addedCardIds.has(String(card.cardId));
               return (
-              <Card key={card.cardId} className={`hover:shadow-md transition-all hover:border-indigo-200 ${selectedIds.has(String(card.cardId)) ? 'border-indigo-300 ring-1 ring-indigo-100 bg-indigo-50/10' : ''}`}>
+              <Card key={card.cardId} className={`hover:shadow-md transition-all hover:border-ring/40 ${selectedIds.has(String(card.cardId)) ? 'border-ring/60 ring-1 ring-ring/20 bg-accent/10' : ''}`}>
                 <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-base text-slate-800 flex items-center justify-between">
-                    <span className="font-semibold text-indigo-700">{card.question}</span>
+                  <CardTitle className="text-base text-foreground flex items-center justify-between">
+                    <span className="font-semibold">{card.question}</span>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleToggleSelect(String(card.cardId))}
                         disabled={isCardInUserCards}
                         className={`p-1.5 transition-colors ${
                           isCardInUserCards 
-                            ? "text-slate-300 cursor-not-allowed" 
-                            : "text-slate-400 hover:text-indigo-600"
+                            ? "text-muted-foreground/40 cursor-not-allowed" 
+                            : "text-muted-foreground hover:text-primary"
                         }`}
                         title={isCardInUserCards ? "已在复习库中" : "选择"}
                       >
                         {selectedIds.has(String(card.cardId)) || isCardInUserCards ? (
-                          <CheckSquare className={`w-5 h-5 ${isCardInUserCards ? "text-slate-300" : "text-indigo-600"}`} />
+                          <CheckSquare className={`w-5 h-5 ${isCardInUserCards ? "text-muted-foreground/40" : "text-primary"}`} />
                         ) : (
                           <Square className="w-5 h-5" />
                         )}
@@ -268,8 +268,8 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
                         disabled={isAddingReview || isCardInUserCards}
                         className={`p-1.5 rounded-md transition-colors ${
                           isCardInUserCards 
-                            ? "text-slate-400 cursor-not-allowed bg-slate-50" 
-                            : "text-indigo-500 hover:bg-indigo-50 disabled:opacity-50"
+                            ? "text-muted-foreground cursor-not-allowed bg-muted" 
+                            : "text-primary hover:bg-accent disabled:opacity-50"
                         }`}
                         title={isCardInUserCards ? "已加入复习库" : "加入复习库"}
                       >
@@ -285,25 +285,25 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-2">
-                  <p className="text-sm text-slate-600 mb-2">{card.content}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{card.content}</p>
                   
                   {card.summary && (
-                    <div className="mt-2 text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                      <span className="font-medium text-slate-500 block mb-1">总结：</span>
+                    <div className="mt-2 text-sm text-muted-foreground bg-muted p-3 rounded-lg border border-border">
+                      <span className="font-medium text-foreground block mb-1">总结：</span>
                       {card.summary}
                     </div>
                   )}
 
                   {card.analogy && (
-                    <div className="mt-2 text-sm text-slate-600 bg-blue-50/50 p-3 rounded-lg border border-blue-50">
-                      <span className="font-medium text-blue-500 block mb-1">类比：</span>
+                    <div className="mt-2 text-sm text-muted-foreground bg-[color:var(--chart-1)]/10 p-3 rounded-lg border border-[color:var(--chart-1)]/15">
+                      <span className="font-medium text-[color:var(--chart-1)] block mb-1">类比：</span>
                       {card.analogy}
                     </div>
                   )}
 
                   {card.mnemonic && (
-                    <div className="mt-2 text-sm text-slate-600 bg-green-50/50 p-3 rounded-lg border border-green-50">
-                      <span className="font-medium text-green-500 block mb-1">记忆口诀：</span>
+                    <div className="mt-2 text-sm text-muted-foreground bg-[color:var(--chart-3)]/10 p-3 rounded-lg border border-[color:var(--chart-3)]/15">
+                      <span className="font-medium text-[color:var(--chart-3)] block mb-1">记忆口诀：</span>
                       {card.mnemonic}
                     </div>
                   )}
@@ -311,7 +311,7 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
                   {card.keywords && card.keywords.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {card.keywords.map((kw, i) => (
-                        <span key={i} className="px-2 py-0.5 text-[10px] bg-indigo-50 text-indigo-600 rounded">
+                        <span key={i} className="px-2 py-0.5 text-[10px] bg-accent text-accent-foreground rounded">
                           {kw}
                         </span>
                       ))}
@@ -326,8 +326,8 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
 
       {result.confusable_group_list && result.confusable_group_list.length > 0 && (
         <div className="space-y-3 mt-6">
-          <h4 className="text-sm font-medium text-slate-700 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-orange-400" />
+          <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[color:var(--chart-4)]" />
             易混淆知识点
           </h4>
           <div className="space-y-3">
@@ -335,20 +335,20 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
               const cardId = `confusable_${i}`;
               const isCardInUserCards = addedCardIds.has(cardId);
               return (
-              <div key={i} className={`p-4 border rounded-xl relative group transition-colors ${selectedIds.has(cardId) ? 'bg-orange-50/80 border-orange-300' : 'bg-orange-50/50 border-orange-100'}`}>
+              <div key={i} className={`p-4 border rounded-xl relative group transition-colors ${selectedIds.has(cardId) ? 'bg-[color:var(--chart-4)]/12 border-[color:var(--chart-4)]/30' : 'bg-[color:var(--chart-4)]/8 border-[color:var(--chart-4)]/18'}`}>
                 <div className={`absolute right-4 top-4 transition-opacity flex items-center gap-1 ${selectedIds.has(cardId) || isCardInUserCards ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                   <button
                     onClick={() => handleToggleSelect(cardId)}
                     disabled={isCardInUserCards}
-                    className={`p-1.5 transition-colors bg-white shadow-sm rounded-md ${
+                    className={`p-1.5 transition-colors bg-card shadow-sm rounded-md ${
                       isCardInUserCards 
-                        ? "text-slate-300 cursor-not-allowed" 
-                        : "text-slate-400 hover:text-orange-600"
+                        ? "text-muted-foreground/40 cursor-not-allowed" 
+                        : "text-muted-foreground hover:text-[color:var(--chart-4)]"
                     }`}
                     title={isCardInUserCards ? "已在复习库中" : "选择"}
                   >
                     {selectedIds.has(cardId) || isCardInUserCards ? (
-                      <CheckSquare className={`w-4 h-4 ${isCardInUserCards ? "text-slate-300" : "text-orange-600"}`} />
+                      <CheckSquare className={`w-4 h-4 ${isCardInUserCards ? "text-muted-foreground/40" : "text-[color:var(--chart-4)]"}`} />
                     ) : (
                       <Square className="w-4 h-4" />
                     )}
@@ -363,10 +363,10 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
                         : undefined
                     })}
                     disabled={isAddingReview || isCardInUserCards}
-                    className={`p-1.5 rounded-md transition-colors bg-white shadow-sm ${
+                    className={`p-1.5 rounded-md transition-colors bg-card shadow-sm ${
                       isCardInUserCards 
-                        ? "text-slate-300 cursor-not-allowed" 
-                        : "text-orange-500 hover:bg-orange-100 disabled:opacity-50"
+                        ? "text-muted-foreground/40 cursor-not-allowed" 
+                        : "text-[color:var(--chart-4)] hover:bg-[color:var(--chart-4)]/15 disabled:opacity-50"
                     }`}
                     title={isCardInUserCards ? "已加入复习库" : "加入复习库"}
                   >
@@ -380,26 +380,26 @@ export function DismantleResultView({ contentId, textContent, isDismantled }: Di
                   </button>
                 </div>
                 <div className="flex items-center gap-2 mb-3 pr-8">
-                  <span className="font-semibold text-orange-800">{group.nameA}</span>
-                  <span className="text-orange-400 text-xs">VS</span>
-                  <span className="font-semibold text-orange-800">{group.nameB}</span>
+                  <span className="font-semibold text-foreground">{group.nameA}</span>
+                  <span className="text-[color:var(--chart-4)] text-xs">VS</span>
+                  <span className="font-semibold text-foreground">{group.nameB}</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                  <div className="text-sm text-slate-600">
-                    <span className="font-medium text-slate-700">{group.nameA}：</span>
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{group.nameA}：</span>
                     {group.descA}
                   </div>
-                  <div className="text-sm text-slate-600">
-                    <span className="font-medium text-slate-700">{group.nameB}：</span>
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{group.nameB}：</span>
                     {group.descB}
                   </div>
                 </div>
 
                 {group.diffPoints && group.diffPoints.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-orange-100/50">
-                    <span className="text-xs font-medium text-orange-800/70 block mb-1.5">核心差异：</span>
-                    <ul className="list-disc list-inside text-sm text-slate-600 ml-1 space-y-1">
+                  <div className="mt-3 pt-3 border-t border-[color:var(--chart-4)]/15">
+                    <span className="text-xs font-medium text-[color:var(--chart-4)]/80 block mb-1.5">核心差异：</span>
+                    <ul className="list-disc list-inside text-sm text-muted-foreground ml-1 space-y-1">
                       {group.diffPoints.map((point, idx) => (
                         <li key={idx}>{point}</li>
                       ))}
